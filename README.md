@@ -1,3 +1,7 @@
 # What are those!? [wat]
 
-See what those nodes are called by simply looking at them
+Get node names by simply looking at them.
+
+![Screenshot](screenshot.png)
+
+![Screenshot 2](screenshot2.png)

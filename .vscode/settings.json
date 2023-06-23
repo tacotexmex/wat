@@ -1,0 +1,11 @@
+{
+    "emeraldwalk.runonsave": {
+        "commands": [
+            {
+                "match": ".lua",
+                "isAsync": true,
+                "cmd": "killall minetest; rm ../../worlds/cordoba/map.sqlite; /Applications/minetest.app/Contents/MacOS/minetest --go --worldname cordoba"
+            },
+        ]
+    }
+}
