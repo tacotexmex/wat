@@ -1,7 +1,7 @@
 -- Create public mod table
 wat = {
     itemstring = {},
-    description = {}
+    description = {},
 }
 
 -- Check mod settings
@@ -18,16 +18,16 @@ minetest.register_on_joinplayer(function(player)
         name = "wat:description",
         position = {
             x = 0.5,
-            y = 0
+            y = 0,
         },
         hud_elem_type = "text",
         number = 0xFFFFFF,
         alignment = 0,
         offset = {
             x = 0,
-            y = 34
+            y = 34,
         },
-        text = ""
+        text = "",
     })
     if show_itemstring then
         -- Create HUD element for node name
@@ -35,16 +35,16 @@ minetest.register_on_joinplayer(function(player)
             name = "wat:name",
             position = {
                 x = 0.5,
-                y = 0
+                y = 0,
             },
             hud_elem_type = "text",
             number = 0xE5E5E5,
             alignment = 0,
             offset = {
                 x = 0,
-                y = 54
+                y = 54,
             },
-            text = ""
+            text = "",
         })
     end
 end)
