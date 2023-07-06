@@ -5,7 +5,7 @@ wat = {
 }
 
 -- Check mod settings
-local show_itemstring = minetest.settings:get_bool("wat.itemstring") or true
+local show_itemstring = minetest.settings:get_bool("wat.itemstring") or false
 
 -- Check for Pointlib mod
 local pointlib_exists = minetest.get_modpath("pointlib")
@@ -119,8 +119,10 @@ else
         end
         -- Get the node description
         description = minetest.registered_nodes[itemstring].description
-        -- Draw the itemstring in the HUD item
-        player:hud_change(wat.itemstring[name], "text", itemstring)
+        -- Draw the itemstring in the HUD item if setting allows
+        if show_itemstring then
+            player:hud_change(wat.itemstring[name], "text", itemstring)
+        end
         -- Draw the description in the HUD item
         player:hud_change(wat.description[name], "text", description)
         -- Reset the HUD timer to display its full cycle
