@@ -89,36 +89,64 @@ if pointlib_exists then
         end
     end)
 else
+    -- Create timer variable
     local timer = 0
+    -- Create HUD timer to keep track of the time HUD item has been visible
     local wathudtimer = {}
-
+    -- Create HUD timer for player when joining
     minetest.register_on_joinplayer(function(player)
         local name = player:get_player_name()
         wathudtimer[name] = 0
     end)
-
+    -- Register punch event
+    minetest.register_on_punchnode(function(pos, node, puncher, pointed_thing)
+        -- Ensure that the thing punched is a node
+        if pointed_thing.type ~= "node" then
+            return
+        end
+        -- I like "player" more
+        local player = puncher
+        -- Variables for the itemstring name and the node description
+        local itemstring
+        local description
+        -- Get player name
+        local name = puncher:get_player_name()
+        -- Set the itemstring
+        itemstring = node.name
+        -- Unhash the itemstring if hashed by scramble mod
+        if scramble_exists or string.sub(itemstring, 1, 2) == "0x" then
+            itemstring = scramble.unhash(itemstring)
+        end
+        -- Get the node description
+        description = minetest.registered_nodes[itemstring].description
+        -- Draw the itemstring in the HUD item
+        player:hud_change(wat.itemstring[name], "text", itemstring)
+        -- Draw the description in the HUD item
+        player:hud_change(wat.description[name], "text", description)
+        -- Reset the HUD timer to display its full cycle
+        wathudtimer[name] = 0
+    end)
+    -- Register loop
     minetest.register_globalstep(function(dtime)
+        -- Count time passed
         timer = timer + dtime
+        -- If time passed is more than a second
         if timer >= 1 then
             -- Check for all online players
             for _, player in pairs(minetest:get_connected_players()) do
+                -- Get player name
                 local name = player:get_player_name()
+                -- Postpone the clearing of text in the HUD item
                 wathudtimer[name] = wathudtimer[name] + 1
-                if wathudtimer[name] >= 5 then
+                -- Check if HUD timer is surpassing 2 seconds
+                if wathudtimer[name] >= 2 then
+                    -- Clear the HUD item of text
                     player:hud_change(wat.itemstring[name], "text", "")
+                    player:hud_change(wat.description[name], "text", "")
                 end
             end
+            -- Reset the timer
             timer = 0
         end
-    end)
-    minetest.register_on_punchnode(function(pos, node, puncher, pointed_thing)
-        local player = puncher
-        local itemstring
-        local name = puncher:get_player_name()
-        if pointed_thing.type == "node" then
-            itemstring = node.name
-        end
-        player:hud_change(wat.itemstring[name], "text", itemstring)
-        wathudtimer[name] = 0
     end)
 end
