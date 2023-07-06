@@ -52,6 +52,14 @@ minetest.register_on_joinplayer(function(player)
     end
 end)
 
+minetest.register_on_leaveplayer(function(player)
+    local name = player:get_player_name()
+    if show_itemstring then
+        player:hud_remove(wat.itemstring[name])
+    end
+    player:hud_remove(wat.description[name])
+end)
+
 if pointlib_exists then
     -- Create timer variable
     local timer = 0
@@ -143,8 +151,10 @@ else
                 -- Check if HUD timer is surpassing 2 seconds
                 if wathudtimer[name] >= 2 then
                     -- Clear the HUD item of text
-                    player:hud_change(wat.itemstring[name], "text", "")
-                    player:hud_change(wat.description[name], "text", "")
+                    if show_itemstring then
+                        player:hud_change(wat.itemstring[name], "text", "")
+                    end
+                        player:hud_change(wat.description[name], "text", "")
                 end
             end
             -- Reset the timer
