@@ -1,1 +1,1 @@
-wat.itemstring (Show technical name of pointed node) bool true
+wat.technical_name (Show technical name of pointed node) bool false

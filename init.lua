@@ -1,11 +1,9 @@
--- Create public mod table
-wat = {
-	itemstring = {},
-	description = {},
-}
+-- Create mod table for storing player values
+local wat = {}
 
 -- Check mod settings
-local show_itemstring = minetest.settings:get_bool("wat.itemstring") or false
+local technical_name = minetest.settings:get_bool("wat.technical_name") or false
+-- TODO Add timeout setting for punching
 
 -- Check for Pointlib mod
 local pointlib_exists = minetest.get_modpath("pointlib")
@@ -17,8 +15,8 @@ local scramble_exists = minetest.get_modpath("scramble")
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
 	-- Create HUD element for node description
-	wat.description[name] = player:hud_add({
-		name = "wat:description",
+	wat[name] = player:hud_add({
+		name = "wat:text",
 		position = {
 			x = 0.5,
 			y = 0,
@@ -32,32 +30,11 @@ minetest.register_on_joinplayer(function(player)
 		},
 		text = "",
 	})
-	if show_itemstring then
-		-- Create HUD element for node name
-		wat.itemstring[name] = player:hud_add({
-			name = "wat:name",
-			position = {
-				x = 0.5,
-				y = 0,
-			},
-			hud_elem_type = "text",
-			number = 0xE5E5E5,
-			alignment = 0,
-			offset = {
-				x = 0,
-				y = 54,
-			},
-			text = "",
-		})
-	end
 end)
 
 minetest.register_on_leaveplayer(function(player)
 	local name = player:get_player_name()
-	if show_itemstring then
-		player:hud_remove(wat.itemstring[name])
-	end
-	player:hud_remove(wat.description[name])
+	player:hud_remove(wat[name])
 end)
 
 if pointlib_exists then
@@ -75,22 +52,23 @@ if pointlib_exists then
 				local name = player:get_player_name()
 				-- Get pointed node
 				local pointed = pointlib.update(player)
-				local itemstring = pointed.itemstring or ""
+				local node_name = pointed.itemstring or ""
 				local description = ""
-				-- If both itemstring and description
-				if itemstring ~= "" and minetest.registered_nodes[itemstring].description then
+				-- If both node_name and description
+				if node_name ~= "" and minetest.registered_nodes[node_name].description then
 					-- Get node description
-					description = minetest.registered_nodes[itemstring].description
+					description = minetest.registered_nodes[node_name].description
 				end
-				if scramble_exists or string.sub(itemstring, 1, 2) == "0x" then
-					itemstring = scramble.unhash(itemstring) or ""
+				if scramble_exists or string.sub(node_name, 1, 2) == "0x" then
+					node_name = scramble.unhash(node_name) or ""
 				end
-				-- Update itemstring HUD if setting is true
-				if show_itemstring then
-					player:hud_change(wat.itemstring[name], "text", itemstring)
+				-- Define what text should be drawn
+				local text = description
+				if technical_name then
+					text = text .. "\n" .. node_name
 				end
 				-- Update description HUD
-				player:hud_change(wat.description[name], "text", description)
+				player:hud_change(wat[name], "text", text)
 			end
 			-- Reset timer
 			timer = 0
@@ -107,32 +85,31 @@ else
 		wathudtimer[name] = 0
 	end)
 	-- Register punch event
-	minetest.register_on_punchnode(function(pos, node, puncher, pointed_thing)
+	minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 		-- Ensure that the thing punched is a node
 		if pointed_thing.type ~= "node" then
 			return
 		end
-		-- I like "player" more
-		local player = puncher
-		-- Variables for the itemstring name and the node description
-		local itemstring
+		-- Variables for the node_name name and the node description
+		local node_name
 		local description
 		-- Get player name
-		local name = puncher:get_player_name()
-		-- Set the itemstring
-		itemstring = node.name
-		-- Unhash the itemstring if hashed by scramble mod
-		if scramble_exists or string.sub(itemstring, 1, 2) == "0x" then
-			itemstring = scramble.unhash(itemstring)
+		local name = player:get_player_name()
+		-- Set the node_name
+		node_name = node.name
+		-- Unhash the node_name if hashed by scramble mod
+		if scramble_exists or string.sub(node_name, 1, 2) == "0x" then
+			node_name = scramble.unhash(node_name)
 		end
 		-- Get the node description
-		description = minetest.registered_nodes[itemstring].description
-		-- Draw the itemstring in the HUD item if setting allows
-		if show_itemstring then
-			player:hud_change(wat.itemstring[name], "text", itemstring)
+		description = minetest.registered_nodes[node_name].description
+		-- Define what text should be drawn
+		local text = description
+		if technical_name then
+			text = text .. "\n" .. node_name
 		end
 		-- Draw the description in the HUD item
-		player:hud_change(wat.description[name], "text", description)
+		player:hud_change(wat[name], "text", text)
 		-- Reset the HUD timer to display its full cycle
 		wathudtimer[name] = 0
 	end)
@@ -151,10 +128,7 @@ else
 				-- Check if HUD timer is surpassing 2 seconds
 				if wathudtimer[name] >= 2 then
 					-- Clear the HUD item of text
-					if show_itemstring then
-						player:hud_change(wat.itemstring[name], "text", "")
-					end
-					player:hud_change(wat.description[name], "text", "")
+					player:hud_change(wat[name], "text", "")
 				end
 			end
 			-- Reset the timer
