@@ -18,15 +18,19 @@ minetest.register_on_joinplayer(function(player)
 	wat[name] = player:hud_add({
 		name = "wat:text",
 		position = {
-			x = 0.5,
-			y = 0,
+			x = 0,
+			y = 0.17,
 		},
 		hud_elem_type = "text",
 		number = 0xFFFFFF,
-		alignment = 0,
+		alignment = {
+			x = 1,
+			y = -1,
+		},
+		style = 0,
 		offset = {
-			x = 0,
-			y = 34,
+			x = 134,
+			y = 0,
 		},
 		text = "",
 	})
@@ -67,6 +71,7 @@ if pointlib_exists then
 				if technical_name then
 					text = text .. "\n" .. node_name
 				end
+				text = text .. "\n"
 				-- Update description HUD
 				player:hud_change(wat[name], "text", text)
 			end
@@ -108,6 +113,7 @@ else
 		if technical_name then
 			text = text .. "\n" .. node_name
 		end
+		text = text .. "\n"
 		-- Draw the description in the HUD item
 		player:hud_change(wat[name], "text", text)
 		-- Reset the HUD timer to display its full cycle
