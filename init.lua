@@ -3,7 +3,7 @@ local wat = {}
 
 -- Check mod settings
 local technical_name = minetest.settings:get_bool("wat.technical_name") or false
-local hud_timeout = minetest.settings:get_int("wat.hud_timeout") or 2
+local hud_timeout = tonumber(minetest.settings:get("wat.hud_timeout")) or 2
 
 -- Check for Pointlib mod
 local pointlib_exists = minetest.get_modpath("pointlib")
