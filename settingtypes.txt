@@ -1,1 +1,5 @@
-wat.technical_name (Show technical name of pointed node) bool false
+#Show technical name of pointed node.
+wat.technical_name (Technical name) bool false
+
+#Number of seconds before clearing the HUD text when not using pointlib.
+wat.hud_timeout (HUD timeout) int 2

@@ -3,7 +3,7 @@ local wat = {}
 
 -- Check mod settings
 local technical_name = minetest.settings:get_bool("wat.technical_name") or false
--- TODO Add timeout setting for punching
+local hud_timeout = minetest.settings:get_int("wat.hud_timeout") or 2
 
 -- Check for Pointlib mod
 local pointlib_exists = minetest.get_modpath("pointlib")
@@ -132,7 +132,7 @@ else
 				-- Postpone the clearing of text in the HUD item
 				wathudtimer[name] = wathudtimer[name] + 1
 				-- Check if HUD timer is surpassing 2 seconds
-				if wathudtimer[name] >= 2 then
+				if wathudtimer[name] >= hud_timeout then
 					-- Clear the HUD item of text
 					player:hud_change(wat[name], "text", "")
 				end
